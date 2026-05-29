@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn2Learn</title>
+
+    <link rel="stylesheet" href="sei.css">
+</head>
+
+<body>
+
+<header>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="login.html">Login</a>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+            <span id="themeIcon">☀️</span>
+            <span id="themeLabel">Light</span>
+        </button>
+    </nav>
+
+</header>
+
+<div id="home" class="carousel next">
+
+    <div class="list">
+
+        <!-- SLIDE 1 -->
+
+        <div class="item">
+            <img src="images/students1.jpg">
+
+            <div class="content">
+
+                <div class="author">
+                    PSU EXCLUSIVE
+                </div>
+
+                <div class="title">
+                    LEARN2LEARN
+                </div>
+
+                <div class="topic">
+                    PEER LEARNING
+                </div>
+
+                <div class="des">
+                    Learn2Learn is a PSU-exclusive peer-assisted learning platform
+                    where students collaborate based on academic strengths and
+                    weaknesses. The system helps students connect, communicate,
+                    and improve subjects together.
+                </div>
+
+                <div class="buttons">
+                    <button onclick="location.href='login.html'">
+                        LOGIN
+                    </button>
+
+                    <button>
+                        LEARN MORE
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+
+        <div class="item">
+            <img src="images/students2.jpg">
+
+            <div class="content">
+
+                <div class="author">
+                    EXPLORE SUBJECTS
+                </div>
+
+                <div class="title">
+                    COURSE
+                </div>
+
+                <div class="topic">
+                    CATALOG
+                </div>
+
+                <div class="des">
+                    Browse all available subjects by college and year level.
+                    Once you find your course, the platform matches you with
+                    a compatible peer — someone strong where you need help,
+                    and who needs help where you are strong.
+                </div>
+
+                <div class="buttons">
+                    <button onclick="location.href='subjects-catalog.html'">
+                        VIEW CATALOG
+                    </button>
+
+                    <button onclick="location.href='#about'">
+                        HOW IT WORKS
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+
+        <div class="item">
+            <img src="images/chat.jpg">
+
+            <div class="content">
+
+                <div class="author">
+                    COMMUNICATION
+                </div>
+
+                <div class="title">
+                    REAL-TIME
+                </div>
+
+                <div class="topic">
+                    CHAT SYSTEM
+                </div>
+
+                <div class="des">
+                    Matched students can communicate through a modern
+                    peer-to-peer academic chat system.
+                    This allows collaborative learning sessions and academic support.
+                </div>
+
+                <div class="buttons">
+                    <button onclick="location.href='chat.html'">
+                        OPEN CHAT
+                    </button>
+
+                    <button>
+                        MORE INFO
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 4 -->
+
+        <div class="item">
+            <img src="images/dashboard.jpg">
+
+            <div class="content">
+
+                <div class="author">
+                    TRACK PROGRESS
+                </div>
+
+                <div class="title">
+                    STUDENT
+                </div>
+
+                <div class="topic">
+                    DASHBOARD
+                </div>
+
+                <div class="des">
+                    Students can monitor completed sessions,
+                    learning progress, compatibility scores,
+                    and collaboration statistics using the dashboard system.
+                </div>
+
+                <div class="buttons">
+                    <button onclick="location.href='dashboard.html'">
+                        OPEN DASHBOARD
+                    </button>
+
+                    <button>
+                        FEATURES
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- THUMBNAILS -->
+
+    <div class="thumbnail">
+
+        <div class="item">
+            <img src="images/students1.jpg">
+
+            <div class="content">
+                <div class="title">
+                    Peer Learning
+                </div>
+
+                <div class="description">
+                    PSU Students
+                </div>
+            </div>
+        </div>
+
+        <div class="item">
+            <img src="images/students2.jpg">
+
+            <div class="content">
+                <div class="title">
+                    Course Catalog
+                </div>
+
+                <div class="description">
+                    Browse Subjects
+                </div>
+            </div>
+        </div>
+
+        <div class="item">
+            <img src="images/chat.jpg">
+
+            <div class="content">
+                <div class="title">
+                    Chat System
+                </div>
+
+                <div class="description">
+                    Collaboration
+                </div>
+            </div>
+        </div>
+
+        <div class="item">
+            <img src="images/dashboard.jpg">
+
+            <div class="content">
+                <div class="title">
+                    Dashboard
+                </div>
+
+                <div class="description">
+                    Progress Tracker
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ARROWS -->
+
+    <div class="arrows">
+        <button id="prev"><</button>
+        <button id="next">></button>
+    </div>
+
+    <div class="time"></div>
+
+</div>
+
+<script src="sei.js"></script>
+<script>
+// ── THEME TOGGLE ──
+function applyTheme(mode) {
+    if (mode === 'light') {
+        document.body.classList.add('light');
+        document.getElementById('themeIcon').textContent  = '🌙';
+        document.getElementById('themeLabel').textContent = 'Dark';
+    } else {
+        document.body.classList.remove('light');
+        document.getElementById('themeIcon').textContent  = '☀️';
+        document.getElementById('themeLabel').textContent = 'Light';
+    }
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.contains('light');
+    const next = isLight ? 'dark' : 'light';
+    localStorage.setItem('l2l-theme', next);
+    applyTheme(next);
+}
+
+// Apply saved theme on load
+const _saved = localStorage.getItem('l2l-theme') || 'dark';
+applyTheme(_saved);
+</script>
+
+<!-- FEATURES SECTION -->
+<section id="features">
+    <div class="section-inner">
+        <div class="section-label">WHAT WE OFFER</div>
+        <h2 class="section-title">Platform <span>Features</span></h2>
+        <p class="section-sub">Everything you need to learn better — together.</p>
+
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>PSU-Exclusive Login</h3>
+                <p>Only verified PSU email accounts can access the platform, ensuring a trusted and secure academic community.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3>Subject Selection</h3>
+                <p>Students from different programs declare subjects they excel at and subjects they need support in — creating a balanced pairing profile.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Smart Matching</h3>
+                <p>Our subject-based matching algorithm connects students whose strengths and weaknesses complement each other for maximum learning impact.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>Peer-to-Peer Chat</h3>
+                <p>A built-in communication system lets matched students message, plan sessions, and collaborate on academic topics in real time.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Student Dashboard</h3>
+                <p>Track your learning sessions, monitor progress per subject, and view your compatibility score and collaboration statistics.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>Web-Based & Accessible</h3>
+                <p>No app install needed. Learn2Learn runs entirely in the browser, making it accessible on any device for all PSU students.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="about">
+    <div class="section-inner about-inner">
+
+        <div class="about-text">
+            <div class="section-label">OUR MISSION</div>
+            <h2 class="section-title">About <span>Learn2Learn</span></h2>
+
+            <p class="about-body">
+                At Palawan State University, students often face a common challenge: some struggle with subjects because they learn at a different pace, have limited time with instructors, or simply lack a peer group to support them. Meanwhile, others excel in those very same subjects — yet there's no central place for these students to find each other.
+            </p>
+
+            <p class="about-body">
+                <strong>Learn2Learn</strong> was created to bridge that gap. It is a PSU-exclusive peer-assisted learning platform where students can identify subjects they are strong and weak at, connect with compatible learning partners, and collaborate through a shared communication system.
+            </p>
+
+            <div class="about-objectives">
+                <h3>Project Objectives</h3>
+                <ul>
+                    <li>✅ Build a login system exclusive to PSU email accounts</li>
+                    <li>✅ Let students from all programs declare their academic strengths and weaknesses</li>
+                    <li>✅ Simulate subject-based student matching between compatible peers</li>
+                    <li>✅ Provide a prototype peer-to-peer communication platform</li>
+                    <li>✅ Design an accessible, user-friendly web environment for PSU students</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="about-visual">
+            <div class="about-stat-card">
+                <span class="stat-num">PSU</span>
+                <span class="stat-label">Exclusive Platform</span>
+            </div>
+            <div class="about-stat-card">
+                <span class="stat-num">6+</span>
+                <span class="stat-label">Subjects Supported</span>
+            </div>
+            <div class="about-stat-card">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Free to Use</span>
+            </div>
+            <div class="about-stat-card">
+                <span class="stat-num">∞</span>
+                <span class="stat-label">Learning Potential</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <p>© 2025 Learn2Learn &nbsp;·&nbsp; Palawan State University &nbsp;·&nbsp; Peer-Assisted Learning Platform</p>
+</footer>
+
+</body>
+</html>

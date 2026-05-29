@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Found — Learn2Learn</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .avatar-initials {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        .match-avatar-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 16px;
+        }
+        .match-avatar-wrap .online-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--orange, #f1683a);
+            opacity: 0.6;
+        }
+        .match-avatar-wrap .online-dot {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #4ade80;
+            border: 2px solid var(--bg, #000);
+        }
+    </style>
+</head>
+<body>
+
+<script>
+(function(){
+    const saved = localStorage.getItem("l2l-theme") || "dark";
+    if(saved === "light") document.body.classList.add("light");
+})();
+</script>
+
+<nav class="page-nav">
+    <a href="index.html" class="brand">Learn2Learn</a>
+    <button class="page-theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+    <a href="subjects.html" class="back">← Change Subjects</a>
+</nav>
+
+<div class="page">
+    <div class="glass-card match-card">
+
+        <div class="eyebrow"> Compatible Match Found</div>
+
+        <div class="match-avatar-wrap">
+            <div class="avatar-initials" id="avatarInitials"></div>
+            <div class="online-ring"></div>
+            <div class="online-dot"></div>
+        </div>
+
+        <div class="match-name" id="matchName"></div>
+        <div class="match-program" id="matchProgram"></div>
+
+        <div class="match-tags">
+            <span class="match-tag strong"> Strong: <span id="partnerStrong"></span></span>
+            <span class="match-tag weak"> Needs: <span id="partnerWeak"></span></span>
+            <span class="match-tag" id="retakeTag" style="display:none;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;"> Retake: <span id="retakeLabel"></span></span>
+        </div>
+
+        <div class="compat-section">
+            <div class="compat-header">
+                <span class="compat-label">Compatibility Score</span>
+                <span class="compat-score" id="compatScore"></span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill-anim" id="compatBar"></div>
+            </div>
+        </div>
+
+        <div class="match-actions">
+            <button class="btn-primary" id="scheduleBtn" onclick="scheduleSession()"> Schedule Session</button>
+            <a href="chat.html" class="btn-secondary"> Start Learning Session</a>
+            <a href="dashboard.html" class="btn-secondary"> View Dashboard</a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function toggleTheme(){
+    const isLight = document.body.classList.contains("light");
+    const next = isLight ? "dark" : "light";
+    localStorage.setItem("l2l-theme", next);
+    document.body.classList.toggle("light", next === "light");
+    document.getElementById("themeToggle").textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
+}
+document.getElementById("themeToggle").textContent =
+    document.body.classList.contains("light") ? "🌙 Dark" : "☀️ Light";
+
+// ── RANDOM MATCH DATA ──
+const firstNames = [
+    "Maria","Juan","Ana","Jose","Rosa","Carlo","Liza","Mark","Claire","Ryan",
+    "Kristine","Patrick","Jessa","Miguel","Camille","Jerome","Bianca","Kevin",
+    "Tricia","Alvin","Sheila","Aldrin","Nica","Ralph","Chesca","Renz","Hazel",
+    "Christian","Lovely","Gab"
+];
+const lastNames = [
+    "Santos","Cruz","Reyes","Garcia","Dela Cruz","Mendoza","Torres","Flores",
+    "Villanueva","Ramos","Aquino","Soriano","Bautista","Castillo","Diaz",
+    "Fernandez","Lim","Magno","Navarro","Ocampo"
+];
+const programs     = ["BSIT","BSCS","BSCpE","BSECE","BSN","BSED","BSBA","BSA"];
+const avatarColors = [
+    "#f1683a","#6366f1","#0ea5e9","#10b981","#f59e0b",
+    "#ec4899","#8b5cf6","#14b8a6","#ef4444","#3b82f6"
+];
+
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function rand(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+let matchData = JSON.parse(sessionStorage.getItem("currentMatch") || "null");
+if (!matchData) {
+    const fn      = pick(firstNames);
+    const ln      = pick(lastNames);
+    const prog    = pick(programs);
+    const yr      = rand(1, 4);
+    const score   = rand(88, 99);
+    const color   = pick(avatarColors);
+    const ordinals = ["","1st","2nd","3rd","4th"];
+    matchData = { fn, ln, prog, yr, score, color, ordinal: ordinals[yr] };
+    sessionStorage.setItem("currentMatch", JSON.stringify(matchData));
+}
+
+// ── APPLY TO PAGE ──
+const initials  = matchData.fn[0] + matchData.ln[0];
+const avatarEl  = document.getElementById("avatarInitials");
+avatarEl.textContent    = initials;
+avatarEl.style.background = matchData.color;
+
+document.getElementById("matchName").textContent    = `${matchData.fn} ${matchData.ln}`;
+document.getElementById("matchProgram").textContent = `${matchData.prog} · ${matchData.ordinal} Year · Palawan State University`;
+
+const score = matchData.score;
+document.getElementById("compatScore").textContent = score + "%";
+document.getElementById("compatBar").style.setProperty("--fill-width", score + "%");
+
+// ── USER SUBJECTS ──
+const strong = localStorage.getItem("strongSubject") || "—";
+const weak   = localStorage.getItem("weakSubject")   || "—";
+const status = localStorage.getItem("userStatus")    || "regular";
+const retake = localStorage.getItem("retakeSubject");
+
+document.getElementById("partnerStrong").textContent = weak;
+document.getElementById("partnerWeak").textContent   = strong;
+
+if (retake && status === "irregular") {
+    document.getElementById("retakeTag").style.display = "inline-flex";
+    document.getElementById("retakeLabel").textContent = retake;
+}
+
+function scheduleSession(){
+    const btn = document.getElementById("scheduleBtn");
+    btn.textContent = " Scheduled — Tomorrow, 6:00 PM";
+    btn.style.background = "#16a34a";
+    btn.disabled = true;
+}
+</script>
+</body>
+</html>

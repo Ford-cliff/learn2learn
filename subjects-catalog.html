@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Catalog — Learn2Learn</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .catalog-page {
+            align-items: flex-start;
+            padding-top: 80px;
+            padding-bottom: 80px;
+        }
+        .catalog-wrap {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 0 24px;
+        }
+
+        /* HERO */
+        .catalog-hero { margin-bottom: 48px; }
+        .catalog-hero h1 { font-size: 2.2rem; font-weight: 800; color: var(--text); margin-bottom: 12px; transition: color 0.3s; }
+        .catalog-hero h1 span { color: var(--orange); }
+        .catalog-hero p { font-size: 0.92rem; color: var(--muted); max-width: 620px; line-height: 1.75; }
+
+        /* MATCHING BANNER */
+        .matching-banner {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--orange);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .match-step-num { font-size: 0.65rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 4px; }
+        .match-step h4 { font-size: 0.88rem; font-weight: 700; color: var(--text); margin: 0 0 4px; transition: color 0.3s; }
+        .match-step p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin: 0; }
+
+        /* COLLEGE TABS */
+        .college-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+        .college-tab {
+            padding: 8px 18px; border-radius: 30px;
+            border: 1px solid var(--border); background: var(--surface);
+            color: var(--muted); font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; letter-spacing: 0.5px;
+        }
+        .college-tab:hover { border-color: var(--orange); color: var(--text); }
+        .college-tab.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+        .college-tab.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+        /* COLLEGE PANEL */
+        .college-panel { display: none; }
+        .college-panel.active { display: block; }
+        .college-header { margin-bottom: 28px; }
+        .college-header h2 { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 6px; transition: color 0.3s; }
+        .college-header p { font-size: 0.82rem; color: var(--muted); }
+
+        /* PROGRAM ACCORDION */
+        .program-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .program-block.unavailable { opacity: 0.5; }
+        .program-header {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px; cursor: pointer;
+            user-select: none; transition: background 0.2s; gap: 12px;
+        }
+        .program-header:hover { background: var(--surface2); }
+        .program-header-left { display: flex; align-items: center; gap: 14px; }
+        .program-code {
+            font-size: 0.65rem; font-weight: 800; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--orange);
+            background: var(--orange-dim); padding: 4px 10px;
+            border-radius: 20px; white-space: nowrap;
+        }
+        .program-name { font-size: 0.9rem; font-weight: 600; color: var(--text); transition: color 0.3s; }
+        .program-badge {
+            font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+            padding: 3px 10px; border-radius: 20px; font-weight: 700; white-space: nowrap;
+        }
+        .badge-available { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; }
+        .badge-soon { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+        .program-chevron { font-size: 0.75rem; color: var(--muted); transition: transform 0.3s; flex-shrink: 0; }
+        .program-block.open .program-chevron { transform: rotate(180deg); }
+
+        /* PROGRAM BODY */
+        .program-body { display: none; border-top: 1px solid var(--border); }
+        .program-block.open .program-body { display: block; }
+
+        /* YEAR BLOCK */
+        .year-block { border-bottom: 1px solid var(--border); }
+        .year-block:last-child { border-bottom: none; }
+
+        .year-title {
+            padding: 16px 24px 0;
+            font-size: 0.72rem; font-weight: 800;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: var(--text); transition: color 0.3s;
+        }
+
+        /* SEMESTER COLUMNS */
+        .sem-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .sem-col {
+            padding: 16px 24px 20px;
+        }
+
+        .sem-col:first-child {
+            border-right: 1px solid var(--border);
+        }
+
+        .sem-label {
+            font-size: 0.62rem; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--orange); margin-bottom: 12px;
+        }
+
+        .subject-list { display: flex; flex-direction: column; gap: 6px; }
+
+        .subject-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 14px;
+            font-size: 0.8rem; color: var(--text);
+            transition: border-color 0.2s, color 0.3s, background 0.3s;
+            line-height: 1.4;
+        }
+        .subject-item:hover { border-color: var(--orange); }
+
+        .subject-code {
+            font-size: 0.62rem; font-weight: 700;
+            letter-spacing: 1px; color: var(--muted);
+            display: block; margin-bottom: 2px;
+        }
+
+        /* CTA */
+        .cta-bar {
+            margin-top: 48px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 32px 36px; display: flex;
+            align-items: center; justify-content: space-between;
+            gap: 24px; transition: background 0.3s, border-color 0.3s;
+        }
+        .cta-bar h3 { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 6px; transition: color 0.3s; }
+        .cta-bar p { font-size: 0.82rem; color: var(--muted); max-width: 500px; }
+        .cta-btn {
+            padding: 14px 32px; background: var(--orange);
+            border: none; border-radius: 10px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 0.8rem;
+            font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; white-space: nowrap; text-decoration: none;
+            display: inline-block; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .cta-btn:hover { background: #c94420; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(241,104,58,0.35); }
+
+        @media (max-width: 768px) {
+            .matching-banner { grid-template-columns: 1fr; }
+            .sem-row { grid-template-columns: 1fr; }
+            .sem-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+            .cta-bar { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<script>
+(function(){
+    var saved = localStorage.getItem("l2l-theme") || "dark";
+    if (saved === "light") document.body.classList.add("light");
+})();
+</script>
+
+<nav class="page-nav">
+    <a href="index.html" class="brand">Learn2Learn</a>
+    <button class="page-theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+    <a href="index.html" class="back">← Back to Home</a>
+</nav>
+
+<div class="page catalog-page">
+<div class="catalog-wrap">
+
+    <!-- HERO -->
+    <div class="catalog-hero">
+        <div class="eyebrow">PSU Academic Programs</div>
+        <h1>Course <span>Catalog</span></h1>
+        <p>Browse all subjects available on the platform, organized by college, program, year level, and semester. Use this to see what subjects you can be matched on before you sign in.</p>
+    </div>
+
+    <!-- HOW MATCHING WORKS -->
+    <div class="matching-banner">
+        <div class="match-step">
+            <div class="match-step-num">Step 01</div>
+            <h4>Browse the Catalog</h4>
+            <p>Find your college, program, and year level here. Each subject listed is one you can declare as a strength or a subject you need help with.</p>
+        </div>
+        <div class="match-step">
+            <div class="match-step-num">Step 02</div>
+            <h4>Declare Your Subjects</h4>
+            <p>After logging in, select which subject you excel at and which one you are struggling with. The system uses these to find your ideal peer match.</p>
+        </div>
+        <div class="match-step">
+            <div class="match-step-num">Step 03</div>
+            <h4>Get Matched and Learn</h4>
+            <p>The platform connects you with a compatible peer — someone strong where you need help, and who needs help where you are strong. Then you learn together.</p>
+        </div>
+    </div>
+
+    <!-- COLLEGE TABS -->
+    <div class="college-tabs">
+        <button class="college-tab active" onclick="switchCollege('sciences', this)">College of Sciences</button>
+        <button class="college-tab disabled">Arts and Humanities</button>
+        <button class="college-tab disabled">Business and Accountancy</button>
+        <button class="college-tab disabled">Criminal Justice Education</button>
+        <button class="college-tab disabled">Engineering, Architecture and Technology</button>
+        <button class="college-tab disabled">Hospitality Management and Tourism</button>
+        <button class="college-tab disabled">Nursing and Health Sciences</button>
+        <button class="college-tab disabled">Teacher Education</button>
+    </div>
+
+    <!-- COLLEGE OF SCIENCES -->
+    <div class="college-panel active" id="panel-sciences">
+
+        <div class="college-header">
+            <h2>College of Sciences</h2>
+            <p>Subjects are currently available for BS Information Technology based on the PSU BSIT Curriculum Program of Study (Effective SY 2018–2019). Other programs are being prepared.</p>
+        </div>
+
+        <!-- BSIT -->
+        <div class="program-block open" id="prog-bsit">
+            <div class="program-header" onclick="toggleProgram('prog-bsit')">
+                <div class="program-header-left">
+                    <span class="program-code">BSIT</span>
+                    <span class="program-name">Bachelor of Science in Information Technology</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="program-badge badge-available">Available</span>
+                    <span class="program-chevron">▼</span>
+                </div>
+            </div>
+
+            <div class="program-body">
+
+                <!-- FIRST YEAR -->
+                <div class="year-block">
+                    <div class="year-title">First Year</div>
+                    <div class="sem-row">
+                        <div class="sem-col">
+                            <div class="sem-label">1st Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">GE-UTS</span>Understanding the Self</div>
+                                <div class="subject-item"><span class="subject-code">GE-CW</span>The Contemporary World</div>
+                                <div class="subject-item"><span class="subject-code">GE-PC</span>Purposive Communication</div>
+                                <div class="subject-item"><span class="subject-code">CC 1/L</span>Introduction to Computing</div>
+                                <div class="subject-item"><span class="subject-code">CC 2/L</span>Computer Programming 1</div>
+                                <div class="subject-item"><span class="subject-code">GE-STS</span>Science, Technology and Society</div>
+                                <div class="subject-item"><span class="subject-code">PATH Fit 1</span>Movement Enhancement</div>
+                                <div class="subject-item"><span class="subject-code">NSTP 1</span>ROTC/CWTS 1</div>
+                            </div>
+                        </div>
+                        <div class="sem-col">
+                            <div class="sem-label">2nd Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">GE-AA</span>Art Appreciation</div>
+                                <div class="subject-item"><span class="subject-code">GE-ES</span>Environmental Science</div>
+                                <div class="subject-item"><span class="subject-code">GE-MMW</span>Mathematics in the Modern World</div>
+                                <div class="subject-item"><span class="subject-code">IT 1</span>Discrete Mathematics</div>
+                                <div class="subject-item"><span class="subject-code">IT 2/L</span>Introduction to Human Computer Interaction</div>
+                                <div class="subject-item"><span class="subject-code">CC 3/L</span>Computer Programming 2</div>
+                                <div class="subject-item"><span class="subject-code">PATH Fit 2</span>Fitness Exercises</div>
+                                <div class="subject-item"><span class="subject-code">NSTP 2</span>ROTC/CWTS 2</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECOND YEAR -->
+                <div class="year-block">
+                    <div class="year-title">Second Year</div>
+                    <div class="sem-row">
+                        <div class="sem-col">
+                            <div class="sem-label">1st Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">GE-PH</span>Readings in Philippine History</div>
+                                <div class="subject-item"><span class="subject-code">GE-Elect EM</span>The Entrepreneurial Mind</div>
+                                <div class="subject-item"><span class="subject-code">IT 3/L</span>Graphics and Visual Computing</div>
+                                <div class="subject-item"><span class="subject-code">CC 4/L</span>Data Structures and Algorithms</div>
+                                <div class="subject-item"><span class="subject-code">IT E1/L</span>IT Elective 1</div>
+                                <div class="subject-item"><span class="subject-code">IT E2/L</span>IT Elective 2</div>
+                                <div class="subject-item"><span class="subject-code">PATH Fit 3</span>Dance and Sports</div>
+                                <div class="subject-item"><span class="subject-code">GE-PS</span>Palawan Studies</div>
+                            </div>
+                        </div>
+                        <div class="sem-col">
+                            <div class="sem-label">2nd Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">GE-Elect MDS</span>Mathematics for Data Science</div>
+                                <div class="subject-item"><span class="subject-code">Electronics/L</span>Fundamentals of Electronics</div>
+                                <div class="subject-item"><span class="subject-code">CC 5/L</span>Information Management 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 4</span>Quantitative Methods w/ Modelling and Simulation</div>
+                                <div class="subject-item"><span class="subject-code">IT 5/L</span>Network Technologies 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 6/L</span>Integrative Programming and Technologies 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 7/L</span>Systems Integration and Architecture 1</div>
+                                <div class="subject-item"><span class="subject-code">PATH Fit 4</span>Recreation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THIRD YEAR -->
+                <div class="year-block">
+                    <div class="year-title">Third Year</div>
+                    <div class="sem-row">
+                        <div class="sem-col">
+                            <div class="sem-label">1st Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">IT 8/L</span>Advanced Database Systems</div>
+                                <div class="subject-item"><span class="subject-code">IT 9/L</span>Network Technologies 2</div>
+                                <div class="subject-item"><span class="subject-code">IT 10/L</span>Information Assurance and Security 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 11/L</span>Web Systems and Technologies 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 12/L</span>Multimedia Systems</div>
+                                <div class="subject-item"><span class="subject-code">GE-ET</span>Ethics</div>
+                                <div class="subject-item"><span class="subject-code">IT E3/L</span>IT Elective 3</div>
+                            </div>
+                        </div>
+                        <div class="sem-col">
+                            <div class="sem-label">2nd Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">IT 13</span>Social and Professional Issues</div>
+                                <div class="subject-item"><span class="subject-code">CC 6/L</span>Application Development and Emerging Technologies 1</div>
+                                <div class="subject-item"><span class="subject-code">IT 14/L</span>Geographic Information System</div>
+                                <div class="subject-item"><span class="subject-code">IT 15/L</span>Embedded System</div>
+                                <div class="subject-item"><span class="subject-code">IT 16/L</span>Information Assurance and Security 2</div>
+                                <div class="subject-item"><span class="subject-code">IT 17</span>Capstone Project and Research 1 (Proposal Writing)</div>
+                                <div class="subject-item"><span class="subject-code">GE-LWR</span>Life and Works of Rizal</div>
+                                <div class="subject-item"><span class="subject-code">GE-IER</span>Intensive English Review</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOURTH YEAR -->
+                <div class="year-block">
+                    <div class="year-title">Fourth Year</div>
+                    <div class="sem-row">
+                        <div class="sem-col">
+                            <div class="sem-label">1st Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">IT 18/L</span>Systems Administration and Maintenance</div>
+                                <div class="subject-item"><span class="subject-code">IT 19</span>Capstone Project and Research 2 (Data Gathering and Writing)</div>
+                                <div class="subject-item"><span class="subject-code">IT E4/L</span>IT Elective 4</div>
+                                <div class="subject-item"><span class="subject-code">IT 20</span>Educational Tour in IT Industry</div>
+                            </div>
+                        </div>
+                        <div class="sem-col">
+                            <div class="sem-label">2nd Semester</div>
+                            <div class="subject-list">
+                                <div class="subject-item"><span class="subject-code">IT 21</span>Thesis Writing and Colloquium</div>
+                                <div class="subject-item"><span class="subject-code">IT 22</span>Practicum (486 hours)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BSCS -->
+        <div class="program-block unavailable">
+            <div class="program-header" style="cursor:default;">
+                <div class="program-header-left">
+                    <span class="program-code" style="opacity:0.5;">BSCS</span>
+                    <span class="program-name">Bachelor of Science in Computer Science</span>
+                </div>
+                <span class="program-badge badge-soon">Coming Soon</span>
+            </div>
+        </div>
+
+        <!-- BSBio -->
+        <div class="program-block unavailable">
+            <div class="program-header" style="cursor:default;">
+                <div class="program-header-left">
+                    <span class="program-code" style="opacity:0.5;">BSBio</span>
+                    <span class="program-name">Bachelor of Science in Biology</span>
+                </div>
+                <span class="program-badge badge-soon">Coming Soon</span>
+            </div>
+        </div>
+
+        <!-- BSMB -->
+        <div class="program-block unavailable">
+            <div class="program-header" style="cursor:default;">
+                <div class="program-header-left">
+                    <span class="program-code" style="opacity:0.5;">BSMB</span>
+                    <span class="program-name">Bachelor of Science in Marine Biology</span>
+                </div>
+                <span class="program-badge badge-soon">Coming Soon</span>
+            </div>
+        </div>
+
+        <!-- BSES -->
+        <div class="program-block unavailable">
+            <div class="program-header" style="cursor:default;">
+                <div class="program-header-left">
+                    <span class="program-code" style="opacity:0.5;">BSES</span>
+                    <span class="program-name">Bachelor of Science in Environmental Science</span>
+                </div>
+                <span class="program-badge badge-soon">Coming Soon</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-bar">
+        <div>
+            <h3>Ready to find your learning partner?</h3>
+            <p>Log in with your PSU account, select your college, program, and year level — the platform will match you with a compatible peer based on your subjects.</p>
+        </div>
+        <a href="login.html" class="cta-btn">Get Started</a>
+    </div>
+
+</div>
+</div>
+
+<script>
+function toggleTheme() {
+    var isLight = document.body.classList.contains("light");
+    var next = isLight ? "dark" : "light";
+    localStorage.setItem("l2l-theme", next);
+    document.body.classList.toggle("light", next === "light");
+    document.getElementById("themeToggle").textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
+}
+document.getElementById("themeToggle").textContent =
+    document.body.classList.contains("light") ? "🌙 Dark" : "☀️ Light";
+
+function switchCollege(id, tab) {
+    document.querySelectorAll(".college-panel").forEach(function(p) { p.classList.remove("active"); });
+    document.querySelectorAll(".college-tab:not(.disabled)").forEach(function(t) { t.classList.remove("active"); });
+    document.getElementById("panel-" + id).classList.add("active");
+    tab.classList.add("active");
+}
+
+function toggleProgram(id) {
+    var block = document.getElementById(id);
+    if (block) block.classList.toggle("open");
+}
+</script>
+</body>
+</html>

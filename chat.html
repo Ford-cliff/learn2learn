@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat — Learn2Learn</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .av {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .av-lg {
+            width: 40px;
+            height: 40px;
+            font-size: 0.85rem;
+        }
+        .av-sm {
+            width: 32px;
+            height: 32px;
+            font-size: 0.7rem;
+        }
+        /* replace img tags inside msg-row */
+        .msg-row img { display: none !important; }
+        .msg-row .av { display: flex; }
+    </style>
+</head>
+<body>
+
+<script>
+(function(){
+    const saved = localStorage.getItem("l2l-theme") || "dark";
+    if(saved === "light") document.body.classList.add("light");
+})();
+</script>
+
+<nav class="page-nav">
+    <a href="index.html" class="brand">Learn2Learn</a>
+    <button class="page-theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+    <a href="match.html" class="back">← Back to Match</a>
+</nav>
+
+<div class="page chat-page">
+<div class="chat-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="chat-sidebar">
+        <div class="chat-sidebar-header">
+            <span class="label">Active Partners</span>
+            <div class="partner-item" id="activePartnerItem">
+                <div class="partner-avatar">
+                    <div class="av av-lg" id="sidebarActiveAv"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="partner-info">
+                    <div class="partner-name" id="sidebarActiveName"></div>
+                    <div class="partner-sub">Can you help me with databases?</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-sidebar-section">Suggested Peers</div>
+
+        <div class="partner-item" style="background:transparent;opacity:0.5;">
+            <div class="partner-avatar">
+                <div class="av" style="background:#6366f1;">JC</div>
+            </div>
+            <div class="partner-info">
+                <div class="partner-name">Juan dela Cruz</div>
+                <div class="partner-sub">BSCS 3B · 88% match</div>
+            </div>
+        </div>
+
+        <div class="partner-item" style="background:transparent;opacity:0.5;">
+            <div class="partner-avatar">
+                <div class="av" style="background:#10b981;">AR</div>
+            </div>
+            <div class="partner-info">
+                <div class="partner-name">Ana Reyes</div>
+                <div class="partner-sub">BSIT 1C · 82% match</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT -->
+    <div class="chat-main">
+
+        <div class="chat-topbar">
+            <div class="chat-topbar-avatar">
+                <div class="av av-lg" id="topbarAv"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="chat-topbar-info">
+                <h3 id="topbarName"></h3>
+                <p id="topbarSub"></p>
+            </div>
+            <div class="chat-subject-badge">📚 Databases Session</div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+
+            <div class="chat-date-divider">Today</div>
+
+            <div class="msg-row other" id="msg1">
+                <div class="av av-sm" id="msgAv1"></div>
+                <div>
+                    <div class="bubble other">Can you help me understand databases? I'm really struggling with normalization.</div>
+                    <div class="bubble-time">2:14 PM</div>
+                </div>
+            </div>
+
+            <div class="msg-row me">
+                <div class="av av-sm" id="myAv1" style="background:#f1683a;">ME</div>
+                <div>
+                    <div class="bubble me">Sure! Normalization is about organizing a database to reduce redundancy. Start with 1NF — every column should hold atomic values.</div>
+                    <div class="bubble-time">2:15 PM</div>
+                </div>
+            </div>
+
+            <div class="msg-row other" id="msg2">
+                <div class="av av-sm" id="msgAv2"></div>
+                <div>
+                    <div class="bubble other">Oh that makes sense! Can you help me with 2NF next? Also — can you help me with Electronics later?</div>
+                    <div class="bubble-time">2:17 PM</div>
+                </div>
+            </div>
+
+            <div class="msg-row me">
+                <div class="av av-sm" id="myAv2" style="background:#f1683a;">ME</div>
+                <div>
+                    <div class="bubble me">Of course! And yes, I'd love help with Electronics — that's exactly why we matched 😄</div>
+                    <div class="bubble-time">2:18 PM</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="chat-inputbar">
+            <input type="text" id="msgInput" placeholder="Type a message…">
+            <button class="chat-send-btn" onclick="sendMessage()" title="Send">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script>
+function toggleTheme(){
+    const isLight = document.body.classList.contains("light");
+    const next = isLight ? "dark" : "light";
+    localStorage.setItem("l2l-theme", next);
+    document.body.classList.toggle("light", next === "light");
+    document.getElementById("themeToggle").textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
+}
+document.getElementById("themeToggle").textContent =
+    document.body.classList.contains("light") ? "🌙 Dark" : "☀️ Light";
+
+// ── PULL MATCH DATA ──
+const matchData = JSON.parse(sessionStorage.getItem("currentMatch") || "null");
+const fullName  = matchData ? `${matchData.fn} ${matchData.ln}` : "Your Partner";
+const initials  = matchData ? matchData.fn[0] + matchData.ln[0] : "??";
+const color     = matchData ? matchData.color : "#f1683a";
+const prog      = matchData ? matchData.prog  : "BSIT";
+const ordinal   = matchData ? matchData.ordinal : "2nd";
+
+// Apply name & initials everywhere
+function setAv(id, bg){ 
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = initials;
+    el.style.background = bg || color;
+}
+
+setAv("sidebarActiveAv");
+setAv("topbarAv");
+setAv("msgAv1");
+setAv("msgAv2");
+
+document.getElementById("sidebarActiveName").textContent = fullName;
+document.getElementById("topbarName").textContent = fullName;
+document.getElementById("topbarSub").textContent = `Online · ${prog} ${ordinal} Year`;
+
+// ── MESSAGING ──
+function sendMessage(){
+    const input = document.getElementById("msgInput");
+    const text  = input.value.trim();
+    if(!text) return;
+
+    const box = document.getElementById("chatMessages");
+    const now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    const row = document.createElement("div");
+    row.className = "msg-row me";
+    row.innerHTML = `
+        <div class="av av-sm" style="background:#f1683a;">ME</div>
+        <div>
+            <div class="bubble me">${escapeHtml(text)}</div>
+            <div class="bubble-time">${now}</div>
+        </div>`;
+    box.appendChild(row);
+    input.value = "";
+    box.scrollTop = box.scrollHeight;
+
+    setTimeout(() => {
+        const replies = [
+            "That's a great point! Let me think about that.",
+            "Yes! I was wondering the same thing.",
+            "Can you explain that a bit more? I want to make sure I understand.",
+            "Got it! That really helps, thanks 😊",
+            "Let's go over that together. I'll share my notes.",
+        ];
+        const reply = replies[Math.floor(Math.random() * replies.length)];
+        const replyTime = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        const replyRow = document.createElement("div");
+        replyRow.className = "msg-row other";
+        replyRow.innerHTML = `
+            <div class="av av-sm" style="background:${color};">${initials}</div>
+            <div>
+                <div class="bubble other">${reply}</div>
+                <div class="bubble-time">${replyTime}</div>
+            </div>`;
+        box.appendChild(replyRow);
+        box.scrollTop = box.scrollHeight;
+    }, 1200);
+}
+
+function escapeHtml(t){
+    return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+document.getElementById("msgInput").addEventListener("keydown", e => {
+    if(e.key === "Enter") sendMessage();
+});
+</script>
+</body>
+</html>

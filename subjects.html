@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Select Subjects — Learn2Learn</title>
+ <link rel="stylesheet" href="style.css">
+ <style>
+ .wizard { width: 100%; max-width: 620px; }
+
+ /* ── STEP BAR ── */
+ .step-bar {
+ display: flex;
+ align-items: center;
+ margin-bottom: 36px;
+ }
+ .step-item {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 6px;
+ flex: 1;
+ position: relative;
+ }
+ .step-item:not(:last-child)::after {
+ content: '';
+ position: absolute;
+ top: 15px;
+ left: 55%; right: -45%;
+ height: 2px;
+ background: var(--border);
+ z-index: 0;
+ transition: background 0.4s;
+ }
+ .step-item.done:not(:last-child)::after,
+ .step-item.active:not(:last-child)::after { background: var(--orange); }
+
+ .step-dot {
+ width: 30px; height: 30px;
+ border-radius: 50%;
+ background: var(--surface2);
+ border: 2px solid var(--border);
+ display: flex; align-items: center; justify-content: center;
+ font-size: 0.72rem; font-weight: 700;
+ color: var(--muted);
+ position: relative; z-index: 1;
+ transition: all 0.3s;
+ }
+ .step-item.active .step-dot {
+ background: var(--orange); border-color: var(--orange);
+ color: #fff; box-shadow: 0 0 0 4px var(--orange-dim);
+ }
+ .step-item.done .step-dot { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+ .step-label {
+ font-size: 0.6rem; letter-spacing: 1.5px;
+ text-transform: uppercase; color: var(--muted);
+ white-space: nowrap; transition: color 0.3s;
+ }
+ .step-item.active .step-label { color: var(--orange); font-weight: 700; }
+ .step-item.done .step-label { color: var(--orange); }
+
+ /* ── PANELS ── */
+ .step-panel { display: none; animation: fadeUp 0.35s ease forwards; }
+ .step-panel.active { display: block; }
+ @keyframes fadeUp {
+ from { opacity: 0; transform: translateY(14px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+ /* ── COLLEGE / PROGRAM GRID ── */
+ .college-grid {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 10px;
+ margin-bottom: 24px;
+ }
+ .college-btn {
+ background: var(--surface2);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ padding: 14px 12px;
+ color: var(--text);
+ font-family: 'Poppins', sans-serif;
+ font-size: 0.75rem; font-weight: 500;
+ line-height: 1.4;
+ cursor: pointer;
+ text-align: left;
+ transition: border-color 0.2s, background 0.2s, transform 0.15s;
+ display: flex; align-items: flex-start; gap: 10px;
+ }
+ .college-btn .icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+ .college-btn:hover { border-color: var(--orange); transform: translateY(-2px); }
+ .college-btn.selected { border-color: var(--orange); background: var(--orange-dim); }
+ .college-btn.disabled {
+ opacity: 0.35; cursor: not-allowed; pointer-events: none;
+ }
+ .college-btn .coming-soon {
+ display: block; font-size: 0.6rem;
+ color: var(--muted); letter-spacing: 1px;
+ text-transform: uppercase; margin-top: 3px;
+ }
+
+ /* ── YEAR CARDS ── */
+ .year-grid {
+ display: grid; grid-template-columns: repeat(4, 1fr);
+ gap: 10px; margin-bottom: 20px;
+ }
+ .year-btn {
+ background: var(--surface2);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ padding: 18px 8px;
+ color: var(--text);
+ font-family: 'Poppins', sans-serif;
+ font-size: 0.8rem; font-weight: 700;
+ cursor: pointer; text-align: center;
+ transition: border-color 0.2s, background 0.2s, transform 0.15s;
+ }
+ .year-btn .year-num {
+ font-size: 1.6rem; font-weight: 900;
+ color: var(--orange);
+ display: block; line-height: 1; margin-bottom: 4px;
+ }
+ .year-btn:hover { border-color: var(--orange); transform: translateY(-2px); }
+ .year-btn.selected { border-color: var(--orange); background: var(--orange-dim); }
+
+ /* ── STATUS TOGGLE ── */
+ .status-toggle { display: flex; gap: 10px; margin-bottom: 24px; }
+ .status-btn {
+ flex: 1; padding: 12px;
+ background: var(--surface2);
+ border: 1px solid var(--border);
+ border-radius: 10px;
+ color: var(--text);
+ font-family: 'Poppins', sans-serif;
+ font-size: 0.78rem; font-weight: 600;
+ cursor: pointer; text-align: center;
+ transition: all 0.2s;
+ }
+ .status-btn:hover { border-color: var(--orange); }
+ .status-btn.selected { border-color: var(--orange); background: var(--orange-dim); }
+ .status-btn .status-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+ .status-btn .status-desc { font-size: 0.66rem; color: var(--muted); margin-top: 3px; display: block; }
+
+ /* ── SUBJECT COLUMNS ── */
+ .subject-columns {
+ display: grid; grid-template-columns: 1fr 1fr;
+ gap: 16px; margin-bottom: 20px;
+ }
+
+ /* ── SUMMARY STRIP ── */
+ .summary-strip {
+ background: var(--orange-dim);
+ border: 1px solid rgba(241,104,58,0.25);
+ border-radius: 10px;
+ padding: 10px 16px;
+ font-size: 0.76rem; color: var(--orange);
+ margin-bottom: 20px;
+ display: none; gap: 6px; flex-wrap: wrap;
+ }
+ .summary-strip.visible { display: flex; }
+ .summary-strip span { color: var(--text); }
+
+ /* ── NAV BUTTONS ── */
+ .wizard-nav { display: flex; gap: 10px; margin-top: 8px; }
+ .btn-back {
+ flex: 0 0 auto;
+ padding: 14px 24px;
+ background: transparent;
+ border: 1px solid var(--border);
+ border-radius: 10px;
+ color: var(--muted);
+ font-family: 'Poppins', sans-serif;
+ font-size: 0.78rem; font-weight: 600;
+ cursor: pointer;
+ transition: border-color 0.2s, color 0.2s;
+ }
+ .btn-back:hover { border-color: var(--orange); color: var(--orange); }
+
+ @media (max-width: 520px) {
+ .college-grid { grid-template-columns: 1fr; }
+ .year-grid { grid-template-columns: repeat(2, 1fr); }
+ .subject-columns { grid-template-columns: 1fr; }
+ }
+ </style>
+</head>
+<body>
+
+<script>
+(function(){
+ var saved = localStorage.getItem("l2l-theme") || "dark";
+ if (saved === "light") document.body.classList.add("light");
+})();
+</script>
+
+<nav class="page-nav">
+ <a href="index.html" class="brand">Learn2Learn</a>
+ <button class="page-theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+ <a href="login.html" class="back">← Logout</a>
+</nav>
+
+<div class="page" style="align-items:flex-start;padding-top:90px;padding-bottom:60px;justify-content:center;">
+<div class="glass-card wizard">
+
+ <!-- STEP BAR -->
+ <div class="step-bar">
+ <div class="step-item active" id="stepDot1">
+ <div class="step-dot">1</div>
+ <div class="step-label">College</div>
+ </div>
+ <div class="step-item" id="stepDot2">
+ <div class="step-dot">2</div>
+ <div class="step-label">Program</div>
+ </div>
+ <div class="step-item" id="stepDot3">
+ <div class="step-dot">3</div>
+ <div class="step-label">Year Level</div>
+ </div>
+ <div class="step-item" id="stepDot4">
+ <div class="step-dot">4</div>
+ <div class="step-label">Subjects</div>
+ </div>
+ </div>
+
+ <!-- SUMMARY STRIP -->
+ <div class="summary-strip" id="summaryStrip"></div>
+
+ <!-- ══ STEP 1: COLLEGE ══ -->
+ <div class="step-panel active" id="panel1">
+ <div class="eyebrow">Step 1 of 4</div>
+ <h1 class="page-title">Your <span>College</span></h1>
+ <p class="page-desc">Select the college department you are currently enrolled in.</p>
+
+ <div class="college-grid">
+ <button class="college-btn" onclick="selectCollege(this,'College of Sciences')">
+ <span class="icon"></span>
+ <span>College of Sciences<span class="coming-soon">5 programs available</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Arts and Humanities<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Business and Accountancy<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Criminal Justice Education<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Engineering, Architecture and Technology<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Hospitality Management and Tourism<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Nursing and Health Sciences<span class="coming-soon">Coming soon</span></span>
+ </button>
+ <button class="college-btn disabled">
+ <span class="icon"></span>
+ <span>College of Teacher Education<span class="coming-soon">Coming soon</span></span>
+ </button>
+ </div>
+
+ <div id="error1" class="msg"></div>
+ <div class="wizard-nav">
+ <button class="btn-primary" onclick="goToStep2()">Next →</button>
+ </div>
+ </div>
+
+ <!-- ══ STEP 2: PROGRAM ══ -->
+ <div class="step-panel" id="panel2">
+ <div class="eyebrow">Step 2 of 4</div>
+ <h1 class="page-title">Your <span>Program</span></h1>
+ <p class="page-desc">Select your degree program under <strong id="collegeNameLabel"></strong>.</p>
+
+ <div class="college-grid" id="programGrid"></div>
+
+ <div id="error2" class="msg"></div>
+ <div class="wizard-nav">
+ <button class="btn-back" onclick="goToStep(1)">← Back</button>
+ <button class="btn-primary" onclick="goToStep3()">Next →</button>
+ </div>
+ </div>
+
+ <!-- ══ STEP 3: YEAR LEVEL ══ -->
+ <div class="step-panel" id="panel3">
+ <div class="eyebrow">Step 3 of 4</div>
+ <h1 class="page-title">Your <span>Year Level</span></h1>
+ <p class="page-desc">Select your current year level in your program.</p>
+
+ <div class="year-grid">
+ <button class="year-btn" onclick="selectYear(this,1)">
+ <span class="year-num">1</span>1st Year
+ </button>
+ <button class="year-btn" onclick="selectYear(this,2)">
+ <span class="year-num">2</span>2nd Year
+ </button>
+ <button class="year-btn" onclick="selectYear(this,3)">
+ <span class="year-num">3</span>3rd Year
+ </button>
+ <button class="year-btn" onclick="selectYear(this,4)">
+ <span class="year-num">4</span>4th Year
+ </button>
+ </div>
+
+ <div id="semesterSection" style="display:none;margin-top:20px;">
+ <p class="page-desc" style="margin-bottom:12px;">Which semester are you currently in?</p>
+ <div class="status-toggle">
+ <button class="status-btn" onclick="selectSemester(this,1)">
+ 1st Semester
+ <span class="status-desc">First half of the school year</span>
+ </button>
+ <button class="status-btn" onclick="selectSemester(this,2)">
+ 2nd Semester
+ <span class="status-desc">Second half of the school year</span>
+ </button>
+ </div>
+ </div>
+
+ <div id="statusSection" style="display:none;margin-top:20px;">
+ <p class="page-desc" style="margin-bottom:12px;">Are you a <strong>regular</strong> or <strong>irregular</strong> student?</p>
+ <div class="status-toggle">
+ <button class="status-btn" onclick="selectStatus(this,'regular')">
+ Regular
+ <span class="status-desc">All subjects passed, on track</span>
+ </button>
+ <button class="status-btn" onclick="selectStatus(this,'irregular')">
+ Irregular
+ <span class="status-desc">Has retake or back subjects</span>
+ </button>
+ </div>
+ </div>
+
+ <div id="error3" class="msg"></div>
+ <div class="wizard-nav">
+ <button class="btn-back" onclick="goToStep(2)">← Back</button>
+ <button class="btn-primary" onclick="goToStep4()">Next →</button>
+ </div>
+ </div>
+
+ <!-- ══ STEP 4: SUBJECTS ══ -->
+ <div class="step-panel" id="panel4">
+ <div class="eyebrow">Step 4 of 4</div>
+ <h1 class="page-title">Your <span>Subjects</span></h1>
+ <p class="page-desc" id="subjectDesc">Select the subject you're strong at and the one you need help with.</p>
+
+ <div class="subject-columns">
+ <div class="form-group">
+ <span class="subject-pair-label label-strong"> I'm Strong At</span>
+ <div class="select-wrapper">
+ <select id="strong"></select>
+ </div>
+ </div>
+ <div class="form-group">
+ <span class="subject-pair-label label-weak"> I Need Help With</span>
+ <div class="select-wrapper">
+ <select id="weak"></select>
+ </div>
+ </div>
+ </div>
+
+ <div id="retakeSection" style="display:none;">
+ <div class="form-group">
+ <span class="subject-pair-label" style="background:rgba(251,191,36,0.12);color:#fbbf24;"> Retake / Back Subject</span>
+ <p style="font-size:0.75rem;color:var(--muted);margin:6px 0 10px;">Pick any subject from a previous year you need to retake.</p>
+ <div class="select-wrapper">
+ <select id="retake"></select>
+ </div>
+ </div>
+ </div>
+
+ <div id="error4" class="msg"></div>
+ <div class="wizard-nav">
+ <button class="btn-back" onclick="goToStep(3)">← Back</button>
+ <button class="btn-primary" onclick="findMatch()">Find My Learning Partner →</button>
+ </div>
+ </div>
+
+</div>
+</div>
+
+<script>
+
+/* ══ THEME ══ */
+function toggleTheme() {
+ var isLight = document.body.classList.contains("light");
+ var next = isLight ? "dark" : "light";
+ localStorage.setItem("l2l-theme", next);
+ document.body.classList.toggle("light", next === "light");
+ document.getElementById("themeToggle").textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
+}
+document.getElementById("themeToggle").textContent =
+ document.body.classList.contains("light") ? "🌙 Dark" : "☀️ Light";
+
+/* ══ DATA: PROGRAMS ══ */
+var PROGRAMS = {
+ "College of Sciences": [
+ { code: "BSIT", label: "Bachelor of Science in Information Technology", icon: "", available: true },
+ { code: "BSCS", label: "Bachelor of Science in Computer Science", icon: "", available: false },
+ { code: "BSBio", label: "Bachelor of Science in Biology", icon: "", available: false },
+ { code: "BSMB", label: "Bachelor of Science in Marine Biology", icon: "", available: false },
+ { code: "BSES", label: "Bachelor of Science in Environmental Science", icon: "", available: false }
+ ]
+};
+
+/* ══ DATA: SUBJECTS by year+semester (BSIT) ══ PSU SY 2018-2019 */
+var SUBJECTS = {
+ "1-1": [
+  "Understanding the Self",
+  "The Contemporary World",
+  "Purposive Communication",
+  "Introduction to Computing",
+  "Computer Programming 1",
+  "Science, Technology and Society"
+ ],
+ "1-2": [
+  "Art Appreciation",
+  "Environmental Science",
+  "Mathematics in the Modern World",
+  "Discrete Mathematics",
+  "Introduction to Human Computer Interaction",
+  "Computer Programming 2"
+ ],
+ "2-1": [
+  "Readings in Philippine History",
+  "The Entrepreneurial Mind",
+  "Graphics and Visual Computing",
+  "Data Structures and Algorithms",
+  "IT Elective 1",
+  "IT Elective 2",
+  "Palawan Studies"
+ ],
+ "2-2": [
+  "Mathematics for Data Science",
+  "Fundamentals of Electronics",
+  "Information Management 1",
+  "Quantitative Methods w/ Modelling and Simulation",
+  "Network Technologies 1",
+  "Integrative Programming and Technologies 1",
+  "Systems Integration and Architecture 1"
+ ],
+ "3-1": [
+  "Advanced Database Systems",
+  "Network Technologies 2",
+  "Information Assurance and Security 1",
+  "Web Systems and Technologies 1",
+  "Multimedia Systems",
+  "Ethics",
+  "IT Elective 3"
+ ],
+ "3-2": [
+  "Social and Professional Issues",
+  "Application Development and Emerging Technologies 1",
+  "Geographic Information System",
+  "Embedded System",
+  "Information Assurance and Security 2",
+  "Capstone Project and Research 1 (Proposal Writing)",
+  "Life and Works of Rizal",
+  "Intensive English Review"
+ ],
+ "4-1": [
+  "Systems Administration and Maintenance",
+  "Capstone Project and Research 2 (Data Gathering and Writing)",
+  "IT Elective 4",
+  "Educational Tour in IT Industry"
+ ],
+ "4-2": [
+  "Thesis Writing and Colloquium",
+  "Practicum (486 hours)"
+ ]
+};
+
+/* ══ STATE ══ */
+var state = { college: null, program: null, year: null, semester: null, status: null };
+
+/* ══ STEP NAVIGATION ══ */
+function setStep(n) {
+ [1,2,3,4].forEach(function(i) {
+ document.getElementById("panel" + i).classList.toggle("active", i === n);
+ var dot = document.getElementById("stepDot" + i);
+ dot.classList.remove("active","done");
+ if (i === n) dot.classList.add("active");
+ else if (i < n) dot.classList.add("done");
+ });
+ updateSummary(n);
+ window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function goToStep(n) { setStep(n); }
+
+/* ══ STEP 1 → 2 ══ */
+function goToStep2() {
+ var e = document.getElementById("error1");
+ if (!state.college) {
+ e.className = "msg error";
+ e.textContent = " Please select your college department.";
+ return;
+ }
+ e.className = "msg";
+ buildProgramGrid();
+ setStep(2);
+}
+
+/* ══ STEP 2 → 3 ══ */
+function goToStep3() {
+ var e = document.getElementById("error2");
+ if (!state.program) {
+ e.className = "msg error";
+ e.textContent = " Please select your degree program.";
+ return;
+ }
+ e.className = "msg";
+ setStep(3);
+}
+
+/* ══ STEP 3 → 4 ══ */
+function goToStep4() {
+ var e = document.getElementById("error3");
+ if (!state.year) {
+ e.className = "msg error";
+ e.textContent = " Please select your year level.";
+ return;
+ }
+ if (state.year >= 2 && !state.status) {
+ e.className = "msg error";
+ e.textContent = " Please select Regular or Irregular status.";
+ return;
+ }
+ e.className = "msg";
+ buildSubjectDropdowns();
+ setStep(4);
+}
+
+/* ══ COLLEGE SELECTION ══ */
+function selectCollege(btn, college) {
+ document.querySelectorAll("#panel1 .college-btn").forEach(function(b) {
+ b.classList.remove("selected");
+ });
+ btn.classList.add("selected");
+ state.college = college;
+ state.program = null;
+ document.getElementById("error1").className = "msg";
+}
+
+/* ══ BUILD PROGRAM GRID ══ */
+function buildProgramGrid() {
+ var grid = document.getElementById("programGrid");
+ var programs = PROGRAMS[state.college] || [];
+ grid.innerHTML = "";
+ document.getElementById("collegeNameLabel").textContent = state.college;
+
+ programs.forEach(function(p) {
+ var btn = document.createElement("button");
+ btn.type = "button";
+ btn.className = "college-btn" + (p.available ? "" : " disabled");
+
+ var iconSpan = document.createElement("span");
+ iconSpan.className = "icon";
+ iconSpan.textContent = p.icon;
+
+ var textSpan = document.createElement("span");
+ textSpan.textContent = p.label;
+
+ var badge = document.createElement("span");
+ badge.className = "coming-soon";
+ badge.textContent = p.available ? p.code + " · Available" : "Coming soon";
+ textSpan.appendChild(badge);
+
+ btn.appendChild(iconSpan);
+ btn.appendChild(textSpan);
+
+ if (p.available) {
+ (function(b, code) {
+ b.onclick = function() { selectProgram(b, code); };
+ })(btn, p.code);
+ }
+
+ grid.appendChild(btn);
+ });
+}
+
+/* ══ PROGRAM SELECTION ══ */
+function selectProgram(btn, code) {
+ document.querySelectorAll("#programGrid .college-btn").forEach(function(b) {
+ b.classList.remove("selected");
+ });
+ btn.classList.add("selected");
+ state.program = code;
+ document.getElementById("error2").className = "msg";
+}
+
+/* ══ YEAR SELECTION ══ */
+function selectYear(btn, year) {
+ document.querySelectorAll(".year-btn").forEach(function(b) { b.classList.remove("selected"); });
+ btn.classList.add("selected");
+ state.year = year;
+ state.semester = null;
+ state.status = null;
+ document.getElementById("error3").className = "msg";
+ /* reset semester buttons */
+ document.querySelectorAll("#semesterSection .status-btn").forEach(function(b) { b.classList.remove("selected"); });
+ document.getElementById("semesterSection").style.display = "block";
+ /* hide status until semester picked */
+ document.getElementById("statusSection").style.display = "none";
+ document.querySelectorAll("#statusSection .status-btn").forEach(function(b) { b.classList.remove("selected"); });
+}
+
+/* ══ SEMESTER SELECTION ══ */
+function selectSemester(btn, sem) {
+ document.querySelectorAll("#semesterSection .status-btn").forEach(function(b) { b.classList.remove("selected"); });
+ btn.classList.add("selected");
+ state.semester = sem;
+ /* show regular/irregular only for 2nd year+ */
+ var ss = document.getElementById("statusSection");
+ if (state.year >= 2) {
+  ss.style.display = "block";
+  document.querySelectorAll("#statusSection .status-btn").forEach(function(b) { b.classList.remove("selected"); });
+  state.status = null;
+ } else {
+  ss.style.display = "none";
+  state.status = "regular";
+ }
+}
+
+/* ══ STATUS SELECTION ══ */
+function selectStatus(btn, status) {
+ document.querySelectorAll("#statusSection .status-btn").forEach(function(b) { b.classList.remove("selected"); });
+ btn.classList.add("selected");
+ state.status = status;
+}
+
+/* ══ BUILD SUBJECT DROPDOWNS ══ */
+function buildSubjectDropdowns() {
+ var key = state.year + "-" + state.semester;
+ var currentSubs = SUBJECTS[key] || [];
+ var strongSel = document.getElementById("strong");
+ var weakSel   = document.getElementById("weak");
+ var retakeSel = document.getElementById("retake");
+ var retakeSection = document.getElementById("retakeSection");
+
+ function populate(sel, list) {
+  sel.innerHTML = "";
+  list.forEach(function(s) {
+   var opt = document.createElement("option");
+   opt.value = s; opt.textContent = s;
+   sel.appendChild(opt);
+  });
+ }
+
+ populate(strongSel, currentSubs);
+ populate(weakSel, currentSubs);
+
+ var ordSuffix = ["st","nd","rd","th"][Math.min(state.year - 1, 3)];
+ var semLabel = state.semester === 1 ? "1st Sem" : "2nd Sem";
+ var statusLabel = state.status === "irregular" ? " · Irregular" : "";
+ document.getElementById("subjectDesc").textContent =
+  state.program + " · " + state.year + ordSuffix + " Year · " + semLabel + statusLabel +
+  " — pick what you're strong at and what you need help with.";
+
+ if (state.status === "irregular" && state.year >= 2) {
+  retakeSection.style.display = "block";
+  var prevSubs = [];
+  /* collect all previous semesters */
+  for (var y = 1; y <= state.year; y++) {
+   for (var s = 1; s <= 2; s++) {
+    if (y === state.year && s >= state.semester) continue;
+    var k = y + "-" + s;
+    prevSubs = prevSubs.concat(SUBJECTS[k] || []);
+   }
+  }
+  populate(retakeSel, prevSubs);
+ } else {
+  retakeSection.style.display = "none";
+ }
+}
+
+/* ══ SUMMARY STRIP ══ */
+function updateSummary(step) {
+ var strip = document.getElementById("summaryStrip");
+ if (step === 1) { strip.classList.remove("visible"); return; }
+
+ var ordinals = ["","st","nd","rd","th"];
+ var parts = "";
+ if (state.college) parts += " <span>" + state.college + "</span>";
+ if (state.program) parts += " &nbsp;·&nbsp; <span>" + state.program + "</span>";
+ if (state.year) parts += " &nbsp;·&nbsp; <span>" + state.year + ordinals[Math.min(state.year,4)] + " Year</span>";
+ if (state.status) parts += " &nbsp;·&nbsp; " + (state.status === "irregular" ? "" : "") +
+ " <span style='text-transform:capitalize'>" + state.status + "</span>";
+
+ strip.innerHTML = parts;
+ strip.classList.add("visible");
+}
+
+/* ══ FIND MATCH ══ */
+function findMatch() {
+ var strong = document.getElementById("strong").value;
+ var weak = document.getElementById("weak").value;
+ var errEl = document.getElementById("error4");
+
+ if (strong === weak) {
+ errEl.className = "msg error";
+ errEl.textContent = " Please choose different subjects for Strong and Needs Help.";
+ return;
+ }
+ errEl.className = "msg";
+
+ localStorage.setItem("strongSubject", strong);
+ localStorage.setItem("weakSubject", weak);
+ localStorage.setItem("userCollege", state.college);
+ localStorage.setItem("userProgram", state.program);
+ localStorage.setItem("userYear", state.year);
+ localStorage.setItem("userSemester", state.semester);
+ localStorage.setItem("userStatus", state.status || "regular");
+
+ if (state.status === "irregular") {
+ localStorage.setItem("retakeSubject", document.getElementById("retake").value);
+ }
+
+ window.location.href = "match.html";
+}
+
+</script>
+</body>
+</html>

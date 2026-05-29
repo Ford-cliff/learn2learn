@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Login — Learn2Learn</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script>
+(function(){
+ const saved = localStorage.getItem("l2l-theme") || "dark";
+ if(saved === "light") document.body.classList.add("light");
+})();
+</script>
+
+<nav class="page-nav">
+ <a href="index.html" class="brand">Learn2Learn</a>
+ <button class="page-theme-toggle" id="themeToggle" onclick="toggleTheme()">☀️ Light</button>
+ <a href="index.html" class="back">← Home</a>
+</nav>
+
+<div class="page">
+ <div class="glass-card login-card">
+
+ <div class="eyebrow">PSU Exclusive</div>
+ <h1 class="page-title">Welcome <span>Back</span></h1>
+ <p class="page-desc">Sign in with your Palawan State University account to access the peer learning platform.</p>
+
+ <div class="psu-badge"> @psu.palawan.edu.ph only</div>
+
+ <div class="form-group">
+ <label>PSU Email Address</label>
+ <input type="email" id="email" placeholder="yourname@psu.palawan.edu.ph">
+ </div>
+
+ <div class="form-group">
+ <label>Password</label>
+ <input type="password" id="password" placeholder="Enter your password">
+ </div>
+
+ <button class="btn-primary" onclick="validateEmail()">Sign In</button>
+
+ <div id="message"></div>
+
+ </div>
+</div>
+
+<script>
+function toggleTheme(){
+ const isLight = document.body.classList.contains("light");
+ const next = isLight ? "dark" : "light";
+ localStorage.setItem("l2l-theme", next);
+ document.body.classList.toggle("light", next === "light");
+ document.getElementById("themeToggle").textContent = next === "light" ? "🌙 Dark" : "☀️ Light";
+}
+
+// Set correct label on load
+document.getElementById("themeToggle").textContent =
+ document.body.classList.contains("light") ? "🌙 Dark" : "☀️ Light";
+
+function validateEmail(){
+ const email = document.getElementById("email").value.trim();
+ const msgEl = document.getElementById("message");
+ if(!email){
+ msgEl.className = "msg error";
+ msgEl.textContent = " Please enter your PSU email address.";
+ return;
+ }
+ if(email.endsWith("@psu.palawan.edu.ph")){
+ msgEl.className = "msg success";
+ msgEl.textContent = " Verified! Redirecting...";
+ setTimeout(() => window.location.href = "subjects.html", 900);
+ } else {
+ msgEl.className = "msg error";
+ msgEl.textContent = " Only @psu.palawan.edu.ph accounts are allowed.";
+ }
+}
+
+document.addEventListener("keydown", e => { if(e.key === "Enter") validateEmail(); });
+</script>
+</body>
+</html>
